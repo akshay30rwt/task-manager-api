@@ -2,6 +2,15 @@ const Task = require('../models/Task');
 
 const addTask = async (req, res) => {
     try {
+        if (Array.isArray(req.body)) {
+            const tasks = await Task.insertMany(req.body);
+
+            return res.status(201).json({
+                message: `${tasks.length} tasks added successfully`,
+                tasks
+            });
+        }
+
         const { title, description, dueDate } = req.body;
         const task = new Task({ title, description, dueDate });
         await task.save();
