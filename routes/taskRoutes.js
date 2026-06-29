@@ -6,7 +6,7 @@ const { addTask, getTasks, getTaskById, updateTask, deleteTask, taskStatus, getT
 router.post('/', addTask);
 router.get('/', getTasks);
 router.get('/filter/:status', getTasksByStatus);
-router.get('sorted/duedate', getTasksSortedByDueDate);
+router.get('/sorted/duedate', getTasksSortedByDueDate);
 router.get('/:id', getTaskById);
 router.put('/:id', updateTask);
 router.delete('/:id', deleteTask);
