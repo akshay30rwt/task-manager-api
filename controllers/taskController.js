@@ -1,4 +1,4 @@
-const Task = require('..//models/Task');
+const Task = require('../models/Task');
 
 const addTask = async (req, res) => {
     try {
@@ -60,7 +60,7 @@ const getTaskById = async (req, res) => {
             });
         }
 
-        res.status(200).json(task);
+        return res.status(200).json(task);
     }
     catch(error) {
         if(error.name === 'CastError') {
@@ -132,4 +132,83 @@ const deleteTask = async (req, res) => {
     }
 }
 
-module.exports = { addTask, getTasks, getTaskById, updateTask, deleteTask };
+const taskStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const updatedTask = await Task.findByIdAndUpdate(id, { status }, { new: true });
+
+        if(!updatedTask) {
+            return res.status(404).json({
+                message: `There is no task with ID: ${id}`
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Task Completed',
+            updatedTask
+        });
+    }
+    catch(error) {
+        if(error.name === 'CastError') {
+            return res.status(400).json({
+                message: 'Invalid ID'
+            });
+        }
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+const getTasksByStatus = async (req, res) => {
+    try {
+        const { status } = req.params;
+
+        const tasks = await Task.find({
+            status: status
+        });
+
+        if(tasks.length === 0) {
+            return res.status(404).json({
+                message: 'There are no tasks'
+            });
+        }
+
+        return res.status(200).json(tasks);
+    }
+    catch(error) {
+        if(error.name === 'CastError') {
+            return res.status(400).json({
+                message: 'Invalid ID'
+            });
+        }
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+const getTasksSortedByDueDate = async (req, res) => {
+    try {
+        const tasks = await Task.find().sort({
+            dueDate: 1
+        });
+
+        if(tasks.length === 0) {
+            return res.status(404).json({
+                message: 'There are no tasks'
+            });
+        }
+
+        return res.status(200).json(tasks);
+    }
+    catch(error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+module.exports = { addTask, getTasks, getTaskById, updateTask, deleteTask, taskStatus, getTasksByStatus, getTasksSortedByDueDate };
